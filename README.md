@@ -3,7 +3,7 @@
 把分镜脚本（PDF / Keynote / 分镜表）做成**可视化 motionboard 视频时间线**的 Codex/Claude skill ——
 让剪辑师不用对着 PDF 想象画面，直接在 DaVinci Resolve 或 Premiere Pro 里"看脚本"。
 
-蒸馏自吉利银河 TT TVC 真实工程（70+ 时间线，aco→bco 多版本演进），并在 DaVinci Resolve 19
+蒸馏自真实汽车 TVC 剪辑工程（70+ 时间线，aco→bco 多版本演进，已脱敏），并在 DaVinci Resolve 19
 与 Premiere Pro 2024 上全流程实测。
 
 ## 它做什么

@@ -2,14 +2,14 @@
 name: motion-cut
 description: >-
   把分镜脚本（PDF / Keynote / 分镜表）做成可视化 motionboard 视频时间线，
-  供剪辑师直接"看脚本"——蒸馏自吉利银河TT DaVinci 工程。
+  供剪辑师直接"看脚本"——蒸馏自真实汽车 TVC DaVinci 工程（已脱敏）。
   必须有分镜脚本输入；没有脚本不要触发。
   Use when the user asks to 把分镜脚本/shooting board 做成可视大纲视频、motionboard、
   animatic、给剪辑师看的动态脚本，或在 DaVinci/PR 里按分镜表搭带 VO/字幕/super 的
   大纲时间线。NOT for 无脚本的自由剪辑 / 慢叙事 / 纯调色 / 单镜头生成提示词。
 license: MIT
 metadata:
-  source: 260810 吉利银河TT pv tvc (DaVinci Resolve project)
+  source: 真实汽车 TVC 剪辑工程（已脱敏, DaVinci Resolve project）
   distilled-by: cangjie-skill v1 (lightweight)
   version: 0.4.3
 ---
@@ -25,11 +25,11 @@ metadata:
 
 ## R — 原文证据（时间线数据）
 
-> `0825_ 银河TT_bco-v7` V1 轨 91 镜：时长分布 <0.5s×14 / 0.5–1s×26 / 1–1.5s×19 /
+> `bco-v7` V1 轨 91 镜：时长分布 <0.5s×14 / 0.5–1s×26 / 1–1.5s×19 /
 > 1.5–2s×9 / 2–3s×14 / 3–4s×4 / >4s×2，中位 1.16s。
 
-> `0802 银河TT_素材` 时间线 6 个 marker：CUT 1「城市路边…编曲」CUT 2「手机弹出
-> 好友语音…」CUT 3「车辆穿行城市弯道…」CUT 4「一键Boost…尾翼升起」
+> `素材` 时间线 6 个 marker：CUT 1「城市路边…编曲」CUT 2「手机弹出
+> 好友语音…」CUT 3「车辆穿行城市弯道…」CUT 4「功能卖点露出…」
 > CUT 5「沿江…指尖敲击方向盘」CUT 6「平稳停在livehouse门口」。
 
 > audio3–8：`436_stem1–6_shine-for-me` 六条音乐 stem 按场错落进出；
@@ -59,11 +59,11 @@ metadata:
 
 ## A1 — 工程中已验证的实例
 
-- 粗剪时间线 `0802 银河TT_TVC 粗剪_v1` → `0825_ 银河TT_bco-v7`：63 条时间线
+- 粗剪时间线 `粗剪_v1` → `bco-v7`：63 条时间线
   的演进全部遵守编号选片约定，任一镜头可凭 `V1-XXXX_源文件名` 回溯。
-- 产品展示段 `0802-吉利银河-产品motion`（31.7s）：镜头时长 2.16→1.60→…→
+- 产品展示段 `产品motion`（31.7s）：镜头时长 2.16→1.60→…→
   3.80→6.24s，末镜 logo hold 最长，符合收敛曲线。
-- `0825_ 银河TT_bco-v7` v9 轨垫 `0815_ 银河TT_bco-v6.mp4` 整段做对照；
+- `bco-v7` v9 轨垫 `bco-v6.mp4` 整段做对照；
   v5 轨垫 `bco-v6 4比3.mov` 做画幅参照。
 
 ## A2 — 何时触发
@@ -91,7 +91,7 @@ seedance-prompt-zh / aigc-tvc-director；成片字幕归 embedded-captions；
 - 多画幅交付（4:3 / 9:16）需单独垫轨参照，不要在主轨上改构图。
 - 轨道分族依赖纪律，团队协作时把轨道命名规范写进工程模板，不要口头约定。
 
-## v0.2 新增：大纲时间线自动化搭建（银河TT outline 实测）
+## v0.2 新增：大纲时间线自动化搭建（outline 实测）
 
 ### 分镜与素材
 - **严格按脚本 cut 编号顺序铺片**，禁止按画面内容自行归场；缺素材的 cut 用占位图
@@ -116,13 +116,13 @@ seedance-prompt-zh / aigc-tvc-director；成片字幕归 embedded-captions；
 
 ### 音频生产
 - VO/同期声只用脚本原文台词，台词表先行（cut/角色/台词/语气/音色ID 五列）
-- 角色-音色一一对应，EVA 类助手全片唯一音色；豆包 TTS 2.0 HTTP API：
+- 角色-音色一一对应，车载语音助手类角色全片唯一音色；豆包 TTS 2.0 HTTP API：
   POST https://openspeech.bytedance.com/api/v3/tts/unidirectional
   Header `X-Api-Key` + `X-Api-Resource-Id: seed-tts-2.0`，语气用 `context_texts` 传
 - 音效五族分轨不变；优先复用项目 SFX 库
 
 ### 动效（Remotion）
-- 浮现类元素（EVA语音条/弹窗/UI浮层）用 Remotion 做 3840x2160 透明通道：
+- 浮现类元素（语音助手条/弹窗/UI浮层）用 Remotion 做 3840x2160 透明通道：
   `npx remotion render src/index.ts <Comp> out.mov --codec=prores --prores-profile=4444 --pixel-format=yuva444p10le --image-format=png`
 - 动效放独立视频轨（V1 之上、SUPER 之下），clip 颜色 Fuchsia
 - 参考库: video-shotcraft（github vincentwei1021/video-shotcraft）
@@ -202,7 +202,7 @@ seedance-prompt-zh / aigc-tvc-director；成片字幕归 embedded-captions；
 - 覆盖层/备选上轨一律 `linkAudio:false`（否则素材自带声会砸到 VO 轨）
 
 ### 完整重建参考实现
-`yinhe-tt-outline-test/build_pr.py`（47 cut 大纲全量：主轨/备选禁用/VO对齐/定格补长/
+`build_pr.py`（参考实现，见 PR 章节）（47 cut 大纲全量：主轨/备选禁用/VO对齐/定格补长/
 SRT字幕/SFX/markers）+ `fix_supers_pr.py`（PNG overlay 方案）+ `pr_classify.jsx`
 （素材箱分类）。三件套即 PR 版 build7。
 
