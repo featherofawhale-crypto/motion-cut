@@ -11,7 +11,7 @@ license: MIT
 metadata:
   source: 真实汽车 TVC 剪辑工程（已脱敏, DaVinci Resolve project）
   distilled-by: cangjie-skill v1 (lightweight)
-  version: 0.4.3
+  version: 0.4.4
 ---
 
 # Motion Cut — 分镜脚本 → 可视化 motionboard
@@ -96,6 +96,12 @@ seedance-prompt-zh / aigc-tvc-director；成片字幕归 embedded-captions；
 ### 分镜与素材
 - **严格按脚本 cut 编号顺序铺片**，禁止按画面内容自行归场；缺素材的 cut 用占位图
   （深灰底+居中标明"cut N 待补素材"），保持结构完整
+- **纯文字分镜（脚本只有描述、连官方示意图都没有）升级为动态示意**：用 Remotion /
+  HyperFrames 生成一段能动的示意镜头（文字+图形动效，标明"示意"），不要只放静态占位图。
+  选什么动效让 agent 自己判断——参考 video-shotcraft 镜头配方库：
+  https://vincentwei1021.github.io/video-shotcraft/library.html
+  （152 个镜头配方卡 / 209 种风格，含 开场品牌/排版/UI/运镜/转场/节奏/收尾 等分类，
+  agent 按该 cut 的脚本描述挑最贴近的配方实现）
 - 同分镜多文件：最重要的主选 V1 显示；备选**全部叠在同分镜位置的上层轨**（V2、V3…）并 SetClipEnabled(False) 隐藏，禁止挪到尾部备选池（v0.3 修正：备选池会让人以为素材丢了）
 - 图片分镜与视频分镜用不同 clip 颜色（视频 Green / 图片 Sky / 占位 Sand）
 - 防黑边：非 16:9 素材 SetProperty ZoomX/ZoomY = max(tl/src)/min(tl/src)；源片自带黑边再加大
@@ -125,7 +131,8 @@ seedance-prompt-zh / aigc-tvc-director；成片字幕归 embedded-captions；
 - 浮现类元素（语音助手条/弹窗/UI浮层）用 Remotion 做 3840x2160 透明通道：
   `npx remotion render src/index.ts <Comp> out.mov --codec=prores --prores-profile=4444 --pixel-format=yuva444p10le --image-format=png`
 - 动效放独立视频轨（V1 之上、SUPER 之下），clip 颜色 Fuchsia
-- 参考库: video-shotcraft（github vincentwei1021/video-shotcraft）
+- 参考库: video-shotcraft —— https://vincentwei1021.github.io/video-shotcraft/library.html
+  （github vincentwei1021/video-shotcraft）；纯文字分镜的动态示意也从这里选配方
 
 ## v0.3 新增：VO 时长对齐 + 稳定性工程（0825 outline 实测）
 

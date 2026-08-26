@@ -14,6 +14,7 @@
 - **台词有声音**：TTS 生成 VO 上轨，画面长度跟着台词走（话说完才切镜：图片延长、视频末帧定格补长）
 - **信息标清楚**：每个 cut 打 marker 写脚本原文；有卖点的 cut 压 super；台词上字幕轨；场首放备注
 - **备选不丢**：一镜多条的备选叠在同位置上层轨并禁用，主选永远在第一轨
+- **纯文字分镜会动**：没有素材也没有示意图的 cut，用 Remotion/HyperFrames 生成动态示意镜头（配方参考 [video-shotcraft 镜头库](https://vincentwei1021.github.io/video-shotcraft/library.html)）
 - **素材分类**：按 主素材/备选/VO/动效/SFX 分箱管理
 
 ## 安装
