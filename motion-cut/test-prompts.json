@@ -1,0 +1,54 @@
+{
+  "skill": "motion-cut",
+  "version": "0.3.0",
+  "cases": [
+    {
+      "id": "should-1",
+      "type": "should_trigger",
+      "prompt": "这是导演脚本PDF，帮我做成能给剪辑师看的动态分镜视频",
+      "expect": "调用 motion-cut：读脚本→按 cut 铺时间线→VO/字幕/super/marker 全套"
+    },
+    {
+      "id": "should-2",
+      "type": "should_trigger",
+      "prompt": "把这个 Keynote 分镜表在达芬奇里搭成 motionboard，台词要配上音",
+      "expect": "调用 motion-cut：脚本提取→VO 对齐→示意图占位"
+    },
+    {
+      "id": "should-3",
+      "type": "should_trigger",
+      "prompt": "分镜 PDF 里的示意图帮我抽出来放到 PR 时间线对应位置",
+      "expect": "调用 motion-cut：PDF 渲染页核对栏位提取, JSX/MCP 上轨"
+    },
+    {
+      "id": "bait-0",
+      "type": "should_not_trigger",
+      "prompt": "我拍了 80 条素材，没有脚本，帮我随便剪个快剪",
+      "expect": "不调用 motion-cut：无脚本输入不触发"
+    },
+    {
+      "id": "bait-1",
+      "type": "should_not_trigger",
+      "prompt": "帮我给这个镜头写一条即梦 Seedance 生成提示词",
+      "expect": "不调用 motion-cut；归 seedance-prompt-zh"
+    },
+    {
+      "id": "bait-2",
+      "type": "should_not_trigger",
+      "prompt": "给这个 talking-head 视频加特效字幕",
+      "expect": "不调用 motion-cut；归 embedded-captions"
+    },
+    {
+      "id": "bait-3",
+      "type": "should_not_trigger",
+      "prompt": "用脚本批量给我达芬奇工程里所有时间线改个名字",
+      "expect": "不调用 motion-cut；归 davinci-resolve（纯 API 操作）"
+    },
+    {
+      "id": "bait-4",
+      "type": "should_not_trigger",
+      "prompt": "帮我把这个 PDF 分镜表转成即梦提示词",
+      "expect": "不调用 motion-cut；归 seedance-prompt-zh / aigc-tvc-director"
+    }
+  ]
+}

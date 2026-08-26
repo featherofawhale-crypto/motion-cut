@@ -1,0 +1,212 @@
+---
+name: motion-cut
+description: >-
+  把分镜脚本（PDF / Keynote / 分镜表）做成可视化 motionboard 视频时间线，
+  供剪辑师直接"看脚本"——蒸馏自吉利银河TT DaVinci 工程。
+  必须有分镜脚本输入；没有脚本不要触发。
+  Use when the user asks to 把分镜脚本/shooting board 做成可视大纲视频、motionboard、
+  animatic、给剪辑师看的动态脚本，或在 DaVinci/PR 里按分镜表搭带 VO/字幕/super 的
+  大纲时间线。NOT for 无脚本的自由剪辑 / 慢叙事 / 纯调色 / 单镜头生成提示词。
+license: MIT
+metadata:
+  source: 260810 吉利银河TT pv tvc (DaVinci Resolve project)
+  distilled-by: cangjie-skill v1 (lightweight)
+  version: 0.4.3
+---
+
+# Motion Cut — 分镜脚本 → 可视化 motionboard
+
+核心用途：给一份分镜脚本（PDF/Key/分镜表），产出一條能播放的大纲时间线
+（DaVinci 或 PR），画面按 cut 顺序走、台词有 VO、卖点压 super、备选叠轨藏好、
+每个镜头可回溯脚本原文——剪辑师拿到就能对着剪。
+
+以下为支撑这条流水线的剪辑方法论与工程避坑，每条都带证据出处，
+可在 `candidates/timelines_dump.json` 中复核。
+
+## R — 原文证据（时间线数据）
+
+> `0825_ 银河TT_bco-v7` V1 轨 91 镜：时长分布 <0.5s×14 / 0.5–1s×26 / 1–1.5s×19 /
+> 1.5–2s×9 / 2–3s×14 / 3–4s×4 / >4s×2，中位 1.16s。
+
+> `0802 银河TT_素材` 时间线 6 个 marker：CUT 1「城市路边…编曲」CUT 2「手机弹出
+> 好友语音…」CUT 3「车辆穿行城市弯道…」CUT 4「一键Boost…尾翼升起」
+> CUT 5「沿江…指尖敲击方向盘」CUT 6「平稳停在livehouse门口」。
+
+> audio3–8：`436_stem1–6_shine-for-me` 六条音乐 stem 按场错落进出；
+> audio10–18：九条音效轨分 whoosh / 脚步动作 / 车身 / 氛围 / rise 五族。
+
+## I — 方法论骨架
+
+**六步，严格按顺序：**
+
+1. **选片编号**：建一条素材时间线集中所有可用素材；选中段标记后，进粗剪的镜头
+   一律改名 `<轨号>-<四位序号>_源文件名`（如 `V1-0047_DJI_...D_B002.mov`）。
+   序号单调递增 = 剪辑决策顺序，源文件名保留 = 随时回溯原始机位。
+2. **分场 marker 先行**：在素材时间线上按剧本打 `CUT n` marker，每个 marker 的
+   note 写一整句场描述（谁、在哪、做什么、产品功能露出点）。先结构后镜头。
+3. **主轨节奏曲线**：V1 只放叙事主镜头。目标分配（以 2 分钟成片为参照）：
+   中位镜头 1.0–1.3s；开场 2 镜放宽到 2–4s 建立空间；中段动作/功能段压到
+   0.5–1s 连切；情绪点与收尾 logo hold 放到 3–6s。30s 产品 motion 短片用
+   0.9s 起步、递增到 6s 收尾的收敛曲线。
+4. **音乐用 stem 分层**：要求/自制鼓、贝斯、和声、旋律、FX、vocal 分轨，
+   每条 stem 一条音频轨，按场开关与错落进出制造段落感；不要把一整首混好的
+   BGM 从头铺到尾。
+5. **音效五族织体**：为 whoosh转场 / 脚步动作 / 产品本体（车身、机械） /
+   环境氛围 / rise·impact 各占独立轨（量级：9+ 条音效轨）。每个硬切/转场
+   至少有一个 whoosh 或 impact 点火；动作镜（走路、放置）必须贴同步音效。
+6. **对照轨版本管理**：改版本时把上一版成片整轨垫在最上层视频轨（关闭显示
+   备用），A/B 对比靠开关轨道而不是靠记忆。不同画幅版本（如 4:3）同样垫轨对照。
+
+## A1 — 工程中已验证的实例
+
+- 粗剪时间线 `0802 银河TT_TVC 粗剪_v1` → `0825_ 银河TT_bco-v7`：63 条时间线
+  的演进全部遵守编号选片约定，任一镜头可凭 `V1-XXXX_源文件名` 回溯。
+- 产品展示段 `0802-吉利银河-产品motion`（31.7s）：镜头时长 2.16→1.60→…→
+  3.80→6.24s，末镜 logo hold 最长，符合收敛曲线。
+- `0825_ 银河TT_bco-v7` v9 轨垫 `0815_ 银河TT_bco-v6.mp4` 整段做对照；
+  v5 轨垫 `bco-v6 4比3.mov` 做画幅参照。
+
+## A2 — 何时触发
+
+用户拿来一批素材（尤其车、3C、快消产品）要剪 30s–2min 的快节奏广告/TVC，
+或问"怎么整理选片""节奏怎么卡""音效怎么铺""音乐怎么切"。
+
+与相邻 skill 的区分：本 skill 管**剪辑结构与节奏**；画面内容生成提示词归
+seedance-prompt-zh / aigc-tvc-director；成片字幕归 embedded-captions；
+纯技术操作 DaVinci API 归 davinci-resolve。
+
+## E — 执行步骤
+
+1. 建 `素材` 时间线导入全部素材 → 按剧本打 CUT marker（note 写场描述）→
+   拉出选中段并按规则 1 改名。
+2. 建新时间线，V1 按规则 3 铺主镜头，先不管音乐，用硬切定节奏。
+3. 音乐 stem 各占一轨，按场进出；VO 独占 audio1。
+4. 按五族开音效轨，逐剪点贴 whoosh/同步音效，尾部 rise + impact。
+5. 改版前把当前版导出成片垫到顶层轨（关闭显示），再动手改。
+
+## B — 边界
+
+- 慢叙事、情绪长片、纪录片不适用；此语法为高密度产品露出服务。
+- 素材量小于 ~20 镜时编号选片是过度工程，直接剪。
+- 多画幅交付（4:3 / 9:16）需单独垫轨参照，不要在主轨上改构图。
+- 轨道分族依赖纪律，团队协作时把轨道命名规范写进工程模板，不要口头约定。
+
+## v0.2 新增：大纲时间线自动化搭建（银河TT outline 实测）
+
+### 分镜与素材
+- **严格按脚本 cut 编号顺序铺片**，禁止按画面内容自行归场；缺素材的 cut 用占位图
+  （深灰底+居中标明"cut N 待补素材"），保持结构完整
+- 同分镜多文件：最重要的主选 V1 显示；备选**全部叠在同分镜位置的上层轨**（V2、V3…）并 SetClipEnabled(False) 隐藏，禁止挪到尾部备选池（v0.3 修正：备选池会让人以为素材丢了）
+- 图片分镜与视频分镜用不同 clip 颜色（视频 Green / 图片 Sky / 占位 Sand）
+- 防黑边：非 16:9 素材 SetProperty ZoomX/ZoomY = max(tl/src)/min(tl/src)；源片自带黑边再加大
+
+### Text+ 字幕规范
+- super：V3 轨、左下角、阿里巴巴普惠体 Medium、clip 颜色 Orange
+- 备注：V4 轨、画面居中、小字半透明(Blend 0.5)、clip 颜色 Lavender
+- 同期声/VO 走字幕轨道：SRT 导入素材池后 AppendToTimeline(recordFrame=0)
+- 字幕央视规范：每行 ≤14 字、无角色前缀、无标点；cue 起止=对应 VO 音频条实际起止
+
+### DaVinci API 避坑（实测）
+- `InsertFusionTitleIntoTimeline` 是连锁插入（ripple），会推动其后**所有未锁轨道**（含时间线 marker）
+  → 插标题前锁全部轨，**marker 永远最后打**
+- 标题插入目标轨 = 当时最上方有内容的视频轨 → 先在目标轨放 dummy 片段"定轨"，插完删 dummy
+- 音频 `recordFrame` 摆放若落在长音频内部会静默失败 → 先用 startFrame/endFrame 限长
+- TTS/AI 生成的单声道音频进达芬奇前统一 `ffmpeg -af pan=stereo|c0=c0|c1=c0`
+- ImportMedia 返回顺序不可靠 → 按 GetName() 建映射再使用
+
+### 音频生产
+- VO/同期声只用脚本原文台词，台词表先行（cut/角色/台词/语气/音色ID 五列）
+- 角色-音色一一对应，EVA 类助手全片唯一音色；豆包 TTS 2.0 HTTP API：
+  POST https://openspeech.bytedance.com/api/v3/tts/unidirectional
+  Header `X-Api-Key` + `X-Api-Resource-Id: seed-tts-2.0`，语气用 `context_texts` 传
+- 音效五族分轨不变；优先复用项目 SFX 库
+
+### 动效（Remotion）
+- 浮现类元素（EVA语音条/弹窗/UI浮层）用 Remotion 做 3840x2160 透明通道：
+  `npx remotion render src/index.ts <Comp> out.mov --codec=prores --prores-profile=4444 --pixel-format=yuva444p10le --image-format=png`
+- 动效放独立视频轨（V1 之上、SUPER 之下），clip 颜色 Fuchsia
+- 参考库: video-shotcraft（github vincentwei1021/video-shotcraft）
+
+## v0.3 新增：VO 时长对齐 + 稳定性工程（0825 outline 实测）
+
+### VO 说完才切镜（台词优先原则）
+- 分镜时长 = max(素材时长, 该 cut 台词组总时长 + 行间隔 0.5s)；先算 VO 需求再排 pos 累加
+- 图片分镜：直接延长到 VO 说完
+- 视频分镜：末帧定格补长。ffmpeg 抽末帧（`-ss <dur-0.08> -frames:v 1`），
+  **再转成定长 mp4 上轨**（`-loop 1 -t <秒> -r 25`）。
+  坑：`standardStillDuration` 项目设置对 AppendToTimeline 的 still 不生效，png 上轨永远是默认 5s
+- 定格帧与同分镜视频用同一 clip 颜色，视觉上是"一个镜头"
+
+### 字幕上轨两条路
+- SRT 路径（推荐，文本精确）：cue 起止=VO 音频条实际起止回写；
+  **上轨前必须播放头归零**（SetCurrentTimecode('00:00:00:00')），否则 cue 整体偏移到片尾
+- 自动识别路径（CreateSubtitlesFromAudio）：**先把音效轨撤空再识别**（音效会被识成 [MUSIC]/垃圾 cue），
+  GUI 对话框语言选"中文普通话-简体"，识完再把音效摆回去；API 调用不认 transcriptionLanguage 设置（19.1.4 实测）
+
+### 分镜表提取（血泪，0826 cut11 事件）
+- **shooting board 是多栏版式，pdftotext 的文本流会把 cut 归属打乱**（本次把 cut14/15 对调、
+  cut11 张冠李戴、漏掉 cut46）→ 分镜表必须以 **PDF 渲染页/逐格截图** 为准核对，
+  用 fitz `get_text('words')` 拿 cut 头部坐标 + `get_image_info()` 按栏位归属图片
+- 脚本里每个 cut 的官方示意图都在 PDF 里，**有图必须放图**（这是给剪辑师看的 motion 大纲，
+  文字占位图等于没放）；提取流水线：PDF 栏位裁剪 → assets/script_frames/cutNN.png
+
+### 达芬奇脚本稳定性（血泪，详见 docs/达芬奇脚本稳定性-runbook.md）
+- **绝不硬杀连着 Resolve 的脚本进程**（alarm/kill -9 会让 fusionscript 不干净断开，
+  Resolve 在 ScriptSymbol 析构时 SIGSEGV——0826 三连崩全是这个堆栈）
+- 长构建分段落盘：每阶段 SaveProject + 日志；脚本必须干净退出
+- 不删仍被任何时间线（含备份）引用的媒体池素材
+- 脚本一律经 tools/resolve_run.sh 启动（预检进程/模态窗、日志双写、无 alarm）
+
+## v0.4 新增：Premiere Pro 自动化通路（0826 MCP 实测，mcp-test 工程）
+
+同一套剪辑方法论落到 Premiere 时的工程通路，全部实测过：
+
+### 连接（一次性配置）
+- MCP server：`node ~/.local/lib/node_modules/adobe-premiere-pro-mcp/dist/index.js`（283 个工具），
+  env `PREMIERE_TEMP_DIR=/tmp/premiere-mcp-bridge`；测试驱动用 `scripts/pr_mcp_client.py`
+  （`--list-tools` / `<tool> '<json>'`）
+- PR 侧的桥是 CEP 面板 MCPBridgeCEP，**面板必须点 Start Bridge 才监听**；免手工方案：
+  在面板 bridge-cep.js 的 DOMContentLoaded 里加 `setTimeout(window.startBridge, 500)` 自动启动
+- 面板调试：extension 目录放 `.debug`（PPRO 端口 8877）并**重启 Premiere 才生效**，
+  之后 `scripts/pr_jsx_eval.mjs '<jsx>'` 可经 CDP 直接跑任意 ExtendScript（面板 HTML 不挂 AX，
+  AppleScript/System Events 拿不到窗口，坐标点击也不可靠；Quartz CGEvent 点击可兜底）
+
+### 工具能力与坑
+- 建序列 `create_sequence` **必须传 presetPath**（.sqpreset 绝对路径），否则弹原生对话框卡死脚本；
+  用户预设一般在 `~/Documents/Adobe/Premiere Pro/24.0/Profile-*/Settings/自定义/`
+- `import_media` 的 **binName 参数实测失效**：物料全部落根目录（bin 照建但为空）。
+  素材分类须用 JSX 兜底：先建 bin，再 `projectItem.moveBin(bin)`
+- JSX 里**边遍历 root.children 边 moveBin 会跳项**（索引失效）：先收集到数组再统一搬
+- 重复 import 同一路径会去重（不产生重复项），可安全重跑
+- `add_to_timeline`：sequenceId + projectItemId + 0-based trackIndex + 秒为单位的 time，
+  返回实际 in/out/duration；`add_marker` / `save_project` / `list_sequence_tracks` 均正常
+- list_project_items 的 treePath 不反映 moveBin 之后的位置（可能缓存），核结构用 JSX walk
+
+### 文字与图形（0826 outline 全量重建实测，v0.4.2 修订）
+- `create_caption_track` 直接吃 import_media 导入的 SRT，字幕轨一次成型 ✓
+- **ExtendScript 写不了文字内容**：`getMGTComponent()` 恒 null；遍历 components 给
+  「源文本」setValue 能写进去（读回正确）但**渲染直接崩**（文字层整层消失）。
+  MOGRT 模板路径（add_text_overlay）同样死在这条上
+- **原生可编辑文字的唯一可靠路径 = UI 自动化**：`pr_ui_text.py`
+  （MCP 设播放头+目标轨 → Quartz 点击轨道头聚焦时间线 → `t` 文字工具 →
+  点击节目监视器定锚点 → 剪贴板 pbcopy + ⌘V 粘贴中文 → esc 退出编辑态 → `v` 回选择工具）。
+  注意：播放头必须先在时间线面板聚焦才同步 UI；粘贴前 esc+v 防上一次编辑态残留造成文字翻倍
+- **调文字大小/位置用文本组件**（`AE.ADBE Text` 的「缩放」「位置」，setValue 数值/数组可用），
+  **绝不用剪辑级「运动」缩放**——绕锚点缩放会把长文本甩出画面（备注截断事故）
+- 版式分区（1920x1080 实测）：super 左下 文本位置 `[0.13,0.82]` 缩放 55；
+  备注顶部居中 `[0.33,0.08]` 缩放 40；字幕轨底部居中（PR 默认）。三者互不遮挡
+- **super 按卖点 cut 放置**（时长=该 cut 时长），不整场铺满；备注只在场首放 ~5s
+- `set_clip_properties`（scale/opacity）在 24.4.1 上失效 → JSX 运动组件兜底；
+  位置参数必须用数组 `[x,y]`，字符串报 Illegal Parameter type
+- `capture_frame` 的时间参数不可靠（可能导播放头帧），验证以节目监视器截图为准
+- 覆盖层/备选上轨一律 `linkAudio:false`（否则素材自带声会砸到 VO 轨）
+
+### 完整重建参考实现
+`yinhe-tt-outline-test/build_pr.py`（47 cut 大纲全量：主轨/备选禁用/VO对齐/定格补长/
+SRT字幕/SFX/markers）+ `fix_supers_pr.py`（PNG overlay 方案）+ `pr_classify.jsx`
+（素材箱分类）。三件套即 PR 版 build7。
+
+### 与 DaVinci 通路的分工
+方法论六条规则（选片编号/分场 marker/节奏曲线/stem 分层/音效五族/对照轨）两软件通用；
+工程操作按宿主选 resolve_run.sh（DaVinci）或 pr_mcp_client.py + pr_jsx_eval.mjs（Premiere）。
+MCP 工具能做的事走 MCP，MCP 做不了的（如素材归 bin）直接 JSX，不要硬掰 MCP 参数。
