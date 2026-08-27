@@ -11,7 +11,7 @@ license: MIT
 metadata:
   source: 真实汽车 TVC 剪辑工程（已脱敏, DaVinci Resolve project）
   distilled-by: cangjie-skill v1 (lightweight)
-  version: 0.4.4
+  version: 0.4.5
 ---
 
 # Motion Cut — 分镜脚本 → 可视化 motionboard
@@ -22,6 +22,17 @@ metadata:
 
 以下为支撑这条流水线的剪辑方法论与工程避坑，每条都带证据出处，
 可在 `candidates/timelines_dump.json` 中复核。
+
+## 字幕规范（央视，全宿主强约束）
+
+无论 DaVinci 还是 PR，同期声/VO 字幕一律遵守，不许破例：
+
+1. **每行 ≤14 个汉字**，长台词必须断行
+2. **无标点**：逗号句号问号全去掉，语气停顿用空格代替
+3. **无称谓/角色前缀**：不写「某某：」，角色区分靠音色与画面
+4. **cue 起止 = 对应 VO 音频条在时间线上的实际起止**（摆完 VO 回读位置再写 SRT，
+   禁止凭估算值写字幕时间）
+5. 台词只用脚本原文，不自行改写；台词表先行（cut/角色/台词/语气/音色ID 五列）
 
 ## R — 原文证据（时间线数据）
 
@@ -110,7 +121,7 @@ seedance-prompt-zh / aigc-tvc-director；成片字幕归 embedded-captions；
 - super：V3 轨、左下角、阿里巴巴普惠体 Medium、clip 颜色 Orange
 - 备注：V4 轨、画面居中、小字半透明(Blend 0.5)、clip 颜色 Lavender
 - 同期声/VO 走字幕轨道：SRT 导入素材池后 AppendToTimeline(recordFrame=0)
-- 字幕央视规范：每行 ≤14 字、无角色前缀、无标点；cue 起止=对应 VO 音频条实际起止
+- 字幕遵守「字幕规范（央视）」章节五条强约束
 
 ### DaVinci API 避坑（实测）
 - `InsertFusionTitleIntoTimeline` 是连锁插入（ripple），会推动其后**所有未锁轨道**（含时间线 marker）
