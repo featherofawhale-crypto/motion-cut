@@ -311,6 +311,17 @@ MCP 工具能做的事走 MCP，MCP 做不了的（如素材归 bin）直接 JSX
     授权合规主体是用户/客户，agent 只负责记录与归档。
 - 三路都失败时按「降级总原则」输出关键词 + 候选表 + 命名/目录方案。
 
+### 无剪辑软件快速出 motionboard（0827 demo 实测）
+- 通路：实拍示意帧用**无头 Chrome CLI 截图**（`--headless --screenshot --window-size=1920,1080`），
+  文字/包装/CG 动态示意用 **Remotion render**，配方从 video-shotcraft 选
+  （库数据在仓库 `gallery/api/library.json`，页面是 JS 渲染的抓不到；
+  raw.githubusercontent 被墙时走 `cdn.jsdelivr.net/gh/<owner>/<repo>@main/...`）。
+  合成用 ffmpeg zoompan（推拉镜头）+ 硬切。
+- **血泪：合成多段 mp4 一律用 concat filter，不要用 concat demuxer**——
+  不同来源（ffmpeg zoompan vs Remotion）时间基不同，demuxer 拼接会静默错位，
+  容器显示 15s 但视频流只有前 2 段（音频却是全长，极具迷惑性）。
+  验证以抽帧为准：在 1/4/7/10/14s 各抽一帧核对内容，别信容器总时长。
+
 ### 动效与文字的分工（v0.5.2 修订：动效归 AI，AE 只管文字备注）
 - **动效示意一律走 AI/程序化生成**（Remotion / HyperFrames / imagegen / 3D 预演，
   即 v0.2 已有通路），不拆"AE 包装清单"——避免与用户的 AI 动效流水线冲突。
