@@ -1,6 +1,6 @@
 {
   "skill": "motion-cut",
-  "version": "0.3.0",
+  "version": "0.5.0",
   "cases": [
     {
       "id": "should-1",
@@ -19,6 +19,24 @@
       "type": "should_trigger",
       "prompt": "分镜 PDF 里的示意图帮我抽出来放到 PR 时间线对应位置",
       "expect": "调用 motion-cut：PDF 渲染页核对栏位提取, JSX/MCP 上轨"
+    },
+    {
+      "id": "should-4",
+      "type": "should_trigger",
+      "prompt": "客户发来了第三版分镜脚本，之前还有一版旧的，帮我搭 motionboard",
+      "expect": "调用 motion-cut 且先执行 STEP 0：确认最终版本，不用旧稿覆盖"
+    },
+    {
+      "id": "should-5",
+      "type": "should_trigger",
+      "prompt": "这个分镜表里 cut7 的台词明显念不完，搭大纲时注意下",
+      "expect": "调用 motion-cut：不改脚本原文，输出《脚本风险提示》并在缺口清单标记"
+    },
+    {
+      "id": "should-6",
+      "type": "should_trigger",
+      "prompt": "大纲时间线要铺参考音乐，帮我在版权音乐网站找几首并下载归档",
+      "expect": "调用 motion-cut：先出 Music Brief，按 Genre+Mood+BPM 检索，记录授权，不明标 LICENSE_UNCONFIRMED"
     },
     {
       "id": "bait-0",

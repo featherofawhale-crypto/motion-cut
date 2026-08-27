@@ -11,7 +11,7 @@ license: MIT
 metadata:
   source: 真实汽车 TVC 剪辑工程（已脱敏, DaVinci Resolve project）
   distilled-by: cangjie-skill v1 (lightweight)
-  version: 0.4.7
+  version: 0.5.2
 ---
 
 # Motion Cut — 分镜脚本 → 可视化 motionboard
@@ -236,3 +236,118 @@ SRT字幕/SFX/markers）+ `fix_supers_pr.py`（PNG overlay 方案）+ `pr_classi
 方法论六条规则（选片编号/分场 marker/节奏曲线/stem 分层/音效五族/对照轨）两软件通用；
 工程操作按宿主选 resolve_run.sh（DaVinci）或 pr_mcp_client.py + pr_jsx_eval.mjs（Premiere）。
 MCP 工具能做的事走 MCP，MCP 做不了的（如素材归 bin）直接 JSX，不要硬掰 MCP 参数。
+
+## v0.5 新增：前置纪律与交付契约（学自后期启动助手，0827）
+
+以下机制不改变六步方法论，只给大纲搭建加上输入、标注、合规与交付纪律。
+
+### STEP 0 — 输入确认与版本优先级（开工前必做）
+- 必须先确认拿到的是**客户最终确认版分镜脚本**。版本优先级：
+  最终确认脚本 > 客户最新修改意见 > 最新会议纪要 > 拍摄方案 > 早期策划稿。
+  不得用旧版分镜表或未确认稿覆盖最终稿。
+- 至少确认：项目名称、成片时长、分辨率/帧率/画幅（含是否多画幅交付）、
+  是否需要 VO、是否需要 super/备注字幕、宿主（DaVinci / PR）。
+- 输入缺失或版本存疑时**停工询问**，不带着疑问开跑。
+
+### 命名权限边界（不得擅自改名的素材）
+- **只允许命名本 skill 自己产出的东西**：脚本参考示意图、占位图、定格补长片段、
+  动效叠加层等生成物料，以及时间线上的 clip 显示名（clip 改名不动源文件）。
+- **不得改名的**：拍摄素材源文件、音乐文件、音效文件、客户提供的任何素材——
+  源文件名一律保持原样（选片编号规则里的 `_源文件名` 后缀就是为此服务）。
+- 音乐/音效的 `MUS_…` / `SFX_…` 规范命名**只适用于本 skill 下载归档的副本**，
+  归档时在 `02_AUDIO/MUSIC` 里另存命名副本，原始下载文件不原地改名。
+
+### 脚本事实 vs 搭建推断（标注纪律）
+- cut 表、场描述 marker note、super、示意图描述中，明确区分两列来源：
+  **脚本原文**（逐字引用）与**搭建推断**（agent 的理解/设计）。
+  不得把推断写成脚本要求。示意图/占位图角标"示意"本身就是此纪律的一部分，保持。
+
+### 《脚本风险提示》（发现问题不改原文）
+- 沿用"台词只用脚本原文"铁律；发现分镜表自身问题（cut 编号错乱、栏位错位、
+  图文不符、台词病句、时长明显不够说完 VO）时**不改脚本**，输出《脚本风险提示》：
+  cut 号 / 问题 / 证据（PDF 页码或坐标）/ 建议问客户的话术。
+  （0826 cut11 事件本质是这类问题，今后除工程记录外同步产出风险提示。）
+
+### 音乐检索与授权（仅限版权音乐网站）
+- 大纲时间线需要参考音乐/正式音乐时，先出 Music Brief：
+  Genre / Mood / BPM / Instrument / Energy / Structure（对应段落情绪）。
+- 搜索用 `Genre + Mood + Energy + Instrument` 组合关键词，不搜"宣传片音乐"这种大词。
+- 版权音乐网站：曲多多 / Musicbed / Artlist / Epidemic Sound / PremiumBeat / AudioJungle；
+  免费低成本：Pixabay Music / YouTube Audio Library / Mixkit。
+- 每首记录：曲名 / 平台 / URL / 时长 / BPM / 情绪 / 推荐段落 / 授权类型 /
+  是否商用 / 是否要求署名 / 下载日期。下载归档到 `02_AUDIO/MUSIC`，
+  命名 `MUS_平台_编号_曲名_情绪_BPM`；License 文件/截图存 `LICENSE/`。
+- **授权不明确标 `LICENSE_UNCONFIRMED`，只能进大纲试剪，不得进最终交付。**
+
+### 音乐检索操作通路（0827 实测分级，按能力选路）
+- **路 A｜Mixkit 无浏览器直通（已实测，首选兜底）**：
+  `scripts/mixkit_search.py <tag> [--download N --out DIR]`，无需浏览器、无需登录。
+  原理：tag 列表页内嵌 JSON-LD（曲名/流派/作者/时长/mp3 直链/授权声明），
+  curl 直接抓页解析下载，授权页 https://mixkit.co/license/#musicFree 可达。
+  已验证 tag：corporate / cinematic（其余 tag 跑时验证）。macOS 框架版 Python 缺 CA
+  证书，脚本内部走 curl 不走 urllib。
+- **路 B｜Musicbed 无浏览器直通（0827 实测）**：
+  `scripts/musicbed_search.py mb "<query>" [--preview N --out DIR]`，
+  POST `novus-api.musicbed.com/api/search/songs` 返回全字段 JSON
+  （曲名/艺人/时长/流派/30s 试听直链），30s 试听可直接下载；
+  **全长 preview 端点 401 = 登录墙**，下载的试听文件名带 `_LOGIN_GATED` 标记。
+- **路 C｜环球 UPM 无浏览器搜候选（0827 实测）**：
+  `scripts/musicbed_search.py upm "<query>" [--locale en-hk]`，
+  SSR 搜索页解析 itemprop 元数据（id/曲名/关键词/时长）。
+  **试听音频 CDN 403 需浏览器**；SSR 页偶发 40s+ 慢响应，脚本已放宽超时到 120s。
+- **路 D｜需真实浏览器的商业库（0827 实测，均无需登录即可读候选）**：
+  - 曲多多 = **haifanwu.com**（旧域名 qudodo.com 已失效，勿用）：
+    `/library` 未登录可读曲名/场景情绪标签/BPM/时长/分轨标记；"立即下载"需登录，
+    有"试用无水印"机制。
+  - PremiumBeat：curl 403（Cloudflare），浏览器内
+    `/zh/royalty-free-music?term=<query>` 可读曲名/艺人/时长/BPM/流派/情绪；
+    下载需账号。
+  - Artlist：curl 直接超时，浏览器内
+    `/royalty-free-music/search?search=<query>` 可读曲名/艺人/流派/时长；
+    下载需 Sign In + 订阅。
+  - Pixabay Music：Cloudflare 拦 curl，同走浏览器。
+  - 浏览器控制用 in-app browser 或用户本机**任意浏览器**（不依赖 Chrome），
+    商业库下载一律操作用户已登录会话，无登录态只出候选表，不得假装已下载。
+    授权合规主体是用户/客户，agent 只负责记录与归档。
+- 三路都失败时按「降级总原则」输出关键词 + 候选表 + 命名/目录方案。
+
+### 动效与文字的分工（v0.5.2 修订：动效归 AI，AE 只管文字备注）
+- **动效示意一律走 AI/程序化生成**（Remotion / HyperFrames / imagegen / 3D 预演，
+  即 v0.2 已有通路），不拆"AE 包装清单"——避免与用户的 AI 动效流水线冲突。
+- **AE 在大纲阶段的职责收窄为时间线文字**：super（卖点字）、备注（场说明）、
+  字幕轨。读脚本时输出《时间线文字清单》，字段：
+  cut 号 / 类型（super / 备注 / 字幕）/ 文案（脚本原文，区分搭建推断）/ 位置 / 时长。
+- 若后期确实需要 AE 成片包装（跟踪合成/HUD/三维），不在这里展开，
+  转交后期启动助手类流程处理，本 skill 不加 L1–L5 分级。
+
+### 素材缺口核查
+- 逐 cut 核对后输出《素材缺口清单》，状态分类：
+  `OK` 已有素材 / `CHECK FOOTAGE` 可能有待核 / `CLIENT` 需客户提供 /
+  `STOCK` 走图库 / `AI` 生成示意（动效示意默认走这条）/ `3D` 三维预演 /
+  `POST` 留给后期（AE 等，本 skill 不实现）。
+- 缺素材的 cut 仍按占位/示意规则上轨保持结构完整，清单随交付物一起给剪辑师。
+
+### 降级总原则
+- 任何一步因权限/崩溃/网站不可达做不到时：**不得假装已完成**，明确说明哪步没做成，
+  同时输出可人工执行的完整替代方案（关键词、URL、命名、目标目录、操作步骤），
+  能力恢复后续跑。
+
+### 执行优先级（时间不够时按此裁剪）
+- P0（没有就不算 motionboard）：分镜按 cut 顺序上轨、VO/台词、场 marker。
+- P1：SRT 字幕、super、缺素材占位/示意、《素材缺口清单》。
+- P2：音效五族、音乐 stem 分层、《时间线文字清单》、授权记录。
+- P3：备选叠轨、对照轨、多画幅参照。
+
+### 交付清单（完工判定）
+交给剪辑师前逐项打勾，缺一不可：
+- [ ] cut 表（cut/脚本原文/搭建推断分列）
+- [ ] 台词表（cut/角色/台词/语气/音色ID）
+- [ ] SRT 字幕（cue 起止=VO 实际起止，遵守央视五条）
+- [ ] 分场 marker（note 写整句场描述）
+- [ ] 缺素材 cut 占位/示意齐全 + 《素材缺口清单》
+- [ ] 《时间线文字清单》（super/备注/字幕，动效示意归 AI 不列 AE 清单）
+- [ ] 音乐/SFX 授权记录（含 LICENSE_UNCONFIRMED 标记）
+- [ ] 《脚本风险提示》（无问题也要产出，写"无"）
+- [ ] 工程已 SaveProject，版本号/日期可回溯
+
+全部打勾才可说"已具备交剪条件"；否则明确说"当前不具备交剪条件，缺：___"。
