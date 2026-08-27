@@ -11,7 +11,7 @@ license: MIT
 metadata:
   source: 真实汽车 TVC 剪辑工程（已脱敏, DaVinci Resolve project）
   distilled-by: cangjie-skill v1 (lightweight)
-  version: 0.4.6
+  version: 0.4.7
 ---
 
 # Motion Cut — 分镜脚本 → 可视化 motionboard
@@ -110,12 +110,17 @@ seedance-prompt-zh / aigc-tvc-director；成片字幕归 embedded-captions；
 - **纯文字分镜（脚本只有描述、连官方示意图都没有）按内容三选一做示意**，禁止只放静态占位图：
   1. **实拍内容**（人骑马、开车、脸部特写等真实世界镜头）→ 用**高精度图形表示**
      （imagegen 生成写实级示意图，按脚本描述写清主体/景别/光线，角标注明"示意"）
-  2. **CG 镜头且有参考视频/画面** → 用 **Remotion 做动态示意**（按参考做镜头运动/
-     图形演绎，透明通道或整帧皆可）
+  2. **CG 镜头** → 用 **Remotion / 3D 预演做动态示意**（见下条，不只限纯文字分镜）
   3. **其他** → Remotion / HyperFrames 动态示意，配方从 video-shotcraft 镜头库选：
      https://vincentwei1021.github.io/video-shotcraft/library.html
      （152 个镜头配方卡 / 209 种风格，含 开场品牌/排版/UI/运镜/转场/节奏/收尾 等分类，
      agent 按该 cut 的脚本描述挑最贴近的实现）
+- **CG / 三维 / 文字包装类镜头（任何 cut 都适用，不只纯文字分镜）**：
+  - 涉及三维内容 → 用 **3D 预演**（Three.js / Spline 等）搭示意
+  - 有参考视频/画面 → 按参考用 Remotion 做镜头运动/图形演绎
+  - **没有参考、只有文字描述也能做**——按描述自行设计镜头与图形
+  - 文字包装（slogan 排版、标题演绎、信息卡片）→ Remotion/HyperFrames 直接做
+  - 输出：透明通道叠加（prores 4444）或整帧示意，角标注明"示意"
 - 同分镜多文件：最重要的主选 V1 显示；备选**全部叠在同分镜位置的上层轨**（V2、V3…）并 SetClipEnabled(False) 隐藏，禁止挪到尾部备选池（v0.3 修正：备选池会让人以为素材丢了）
 - 图片分镜与视频分镜用不同 clip 颜色（视频 Green / 图片 Sky / 占位 Sand）
 - 防黑边：非 16:9 素材 SetProperty ZoomX/ZoomY = max(tl/src)/min(tl/src)；源片自带黑边再加大
